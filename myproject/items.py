@@ -31,3 +31,9 @@ class MovieItem(scrapy.Item):
     movieInfo = scrapy.Field()
     star = scrapy.Field()
     quote = scrapy.Field()
+
+
+class YiYaoWangDrugItem(scrapy.Item):
+    id = scrapy.Field()
+    short_name = scrapy.Field()
+    product_name = scrapy.Field()

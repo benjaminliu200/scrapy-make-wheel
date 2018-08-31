@@ -32,3 +32,14 @@ def parse(self, response):
         item['desc'] = sel.xpath('text()').extract()
         yield item
 ```
+
+### 定制正则爬取url，请查看yiyaowang的spider
+生成爬取文件，unicode码转化为中文，需要携带-s参数, ey:-s FEED_EXPORT_ENCODING=utf-8
+<br />
+scrapy crawl yiyaowang -o demo.json -s FEED_EXPORT_ENCODING=utf-8
+
+### 数据入库
+需要重写pipelines，具体裤衩看pipelines包中的movie_pipline.py，通过isinstance是哪个类型，入库需要的类型
+
+### user-agent切换
+需要在根包下的settings配置DOWNLOADER_MIDDLEWARES，切换user-agent
