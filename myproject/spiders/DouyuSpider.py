@@ -2,11 +2,10 @@
 # Author: liudeyong
 import json
 
-import scrapy
 from scrapy import Request
 from scrapy.spiders import Spider
 
-from myproject.items import YiYaoWangDrugItem, DouyuItem
+from myproject.items import DouyuItem
 
 
 class DouyuSpider(Spider):
@@ -28,4 +27,7 @@ class DouyuSpider(Spider):
             item = DouyuItem()
             item['rid'] = data['rid']
             item['nn'] = data['nn']
+            print '---------------------------------' + data['rs1']
+            # 重点：这里需要用数组形式，存放到image_urls。
+            item['image_urls'] = [data['rs1']]
             yield item

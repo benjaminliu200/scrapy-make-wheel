@@ -42,3 +42,6 @@ class YiYaoWangDrugItem(scrapy.Item):
 class DouyuItem(scrapy.Item):
     rid = scrapy.Field()
     nn = scrapy.Field()
+    images = scrapy.Field()
+    image_urls = scrapy.Field()
+    image_paths = scrapy.Field()
