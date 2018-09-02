@@ -6,7 +6,7 @@
     scrapy startproject myproject 创建项目
     scrapy genspider mydomain mydomain.com 生成spider
     scrapy list 列出所有的spider
-    scrapy crawl “spider1” 运行spider1爬虫可以在末尾携带参数。 -a category=electronics
+    scrapy crawl “spider1” 运行spider1爬虫可以在末尾携带参数。 保存到文件：-o demo.json, （解决unicode字符-a category=electronics）或者使用在settings.py文件中FEED_EXPORT_ENCODING = 'utf-8'
     scrapy check spider1 运行contact检查
     scrapy fetch url 不需要项目，下载一个url，保存到标准输出
     scrapy view url 不需要项目，检查一个url，是否是标注输出

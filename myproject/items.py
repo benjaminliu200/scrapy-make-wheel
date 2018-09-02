@@ -37,3 +37,8 @@ class YiYaoWangDrugItem(scrapy.Item):
     id = scrapy.Field()
     short_name = scrapy.Field()
     product_name = scrapy.Field()
+
+
+class DouyuItem(scrapy.Item):
+    rid = scrapy.Field()
+    nn = scrapy.Field()

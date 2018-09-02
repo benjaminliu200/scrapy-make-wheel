@@ -96,6 +96,9 @@ ITEM_PIPELINES = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+# 设置导出为utf-8格式
+FEED_EXPORT_ENCODING = 'utf-8'
 PROXY = "http://localhost:8888"
 
 PROXY_LIST = [
