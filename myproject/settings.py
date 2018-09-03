@@ -73,7 +73,7 @@ charset = "utf8"
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     # 开启moive的item入库管道
-    'myproject.pipelines.movie_pipline.MoviePipeline': 300,
+    'myproject.pipelines.process_mysql_pipeline.ProcessMysqlPipeline': 300,
     # 开启下载图片管道
     'scrapy.pipelines.images.ImagesPipeline': 1
 }

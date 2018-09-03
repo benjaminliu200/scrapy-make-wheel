@@ -43,3 +43,15 @@ scrapy crawl yiyaowang -o demo.json -s FEED_EXPORT_ENCODING=utf-8
 
 ### user-agent切换
 需要在根包下的settings配置DOWNLOADER_MIDDLEWARES，切换user-agent
+
+###  No module named PIL 问题修复
+pip install Pillow 
+
+### 安装pymysql数据库连接池
+首先运行pip install PyMysqlPool可能会遇到此错误： Failed building wheel for mysqlclient
+。还有可能会遇到缺少Microsoft Visual C++ Compiler for Python 2.7，直接安装就好。
+安装好了PyMysqlPool之后，可以在github上找到该库的使用:https://github.com/LuciferJack/python-mysql-pool
+<br/>
+错误1：遇到mysqlclient安装失败，可以去https://www.lfd.uci.edu/~gohlke/pythonlibs/#mysql-python找到合适的mysqlclient
+<br />
+pip install C:\Users\liudeyong\Downloads\mysqlclient-1.3.13-cp27-cp27m-win_amd64.whl
