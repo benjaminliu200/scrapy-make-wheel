@@ -4,24 +4,31 @@ import json
 import logging
 import re
 import time
+from urlparse import urljoin
 
 import scrapy
 from scrapy import Spider
-from scrapy.commands import parse
 from selenium import webdriver
 from w3lib.html import remove_tags
 
-from myproject.items import ZhihuQuestionItem
+from myproject.items import ZhihuQuestionItem, ZhihuAnswerItem
 
 
 class ZhihuSpider(Spider):
     name = 'zhihu'
-    start_urls = ['http://www.zhihu.com/#signin']
+    start_urls = [
+        # 'https://www.zhihu.com/question/279760350/answer/462479732'
+        "http://www.zhihu.com"
+    ]
     allowed_domains = ["www.zhihu.com"]
     headers = {
-        'Host': 'www.zhihu.com',
-        'Referer': 'http://www.zhihu.com',
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36',
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip,deflate",
+        "Accept-Language": "en-US,en;q=0.8,zh-TW;q=0.6,zh;q=0.4",
+        "Connection": "keep-alive",
+        "Content-Type": " application/x-www-form-urlencoded; charset=UTF-8",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36",
+        "Referer": "http://www.zhihu.com/"
     }
 
     def start_requests(self):
@@ -47,7 +54,7 @@ class ZhihuSpider(Spider):
         url_list = []  # 保存全部url，并用来进一步提取是question的URl
         for url in content_urls:
             # 大部分的url都是不带主域名的，所以通过parse函数拼接一个完整的url
-            urls = parse.urljoin(response.url, url)
+            urls = urljoin(response.url, url)
             url_list.append(urls)
 
         # 筛选所有urls中是知乎问答的urls（分析问答urls格式发现是：/question/xxxxxxxxx）
@@ -89,7 +96,10 @@ class ZhihuSpider(Spider):
         comment_num = response.css(".QuestionHeader-Comment").extract_first('')
         if "评论" in comment_num:  # 判断是否有评论，可能一些问答没有评论
             comment_num = response.css(".QuestionHeader-Comment>button::text").extract_first('')
-            comment_num = re.findall('([\s\S]*?)条评论', comment_num)[0].strip()
+            comment_nums = re.findall('([\d])', comment_num)
+            comment_num = ''
+            for comment in comment_nums:
+                comment_num += comment
         watch_click = response.css(".NumberBoard-itemValue::text").extract()
         if len(watch_click[0]) > 3:  # 去除大于3位数多出来的逗号'1,234'
             watch_user_num = watch_click[0]
@@ -123,9 +133,42 @@ class ZhihuSpider(Spider):
         questionItem['crawl_time'] = crawl_time
         yield questionItem
         # 请求知乎相应回答数据，根据分析出的api接口发起请求，得到是json数据
-        # start_answe_url.format(zhihu_id,20,0)，请求url中有三个要传参数通过format()给
+        # start_answe_url.format(zhihu_id,20,0)，请求url中有三个要传参数通过format()。 取前20条回答解析
         yield scrapy.Request(url=start_answe_url.format(zhihu_id, 20, 0), headers=self.headers,
                              callback=self.parse_answer)
+
+    # 请求知乎问答的用户回答，api接口，返回是一个json数据
+    def parse_answer(self, response):
+        answer_data = json.loads(response.text)
+        is_end = answer_data['paging']['is_end']  # 判断是否还有下一页
+        for data in answer_data['data']:  # 解析json中相应想要爬取的数据
+            zhihu_id = data['id']
+            url = data['url']
+            question_id = data['question']['id']
+            author_id = data['author']['id'] if 'id' in data['author'] else None
+            content = data['content']
+            praise_num = data['voteup_count']
+            comments_num = data['comment_count']
+            # 将获取时间格式为1530878188数字串转换成时间格式
+            create_time = datetime.datetime.fromtimestamp(data['created_time'])
+            update_time = datetime.datetime.fromtimestamp(data['updated_time'])
+            crawl_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # 同样转成str
+            # 保存Item
+            answerItem = ZhihuAnswerItem()
+            answerItem['zhihu_id'] = zhihu_id
+            answerItem['url'] = url
+            answerItem['question_id'] = question_id
+            answerItem['author_id'] = author_id
+            answerItem['content'] = content
+            answerItem['praise_num'] = praise_num
+            answerItem['comments_num'] = comments_num
+            answerItem['update_time'] = update_time
+            answerItem['create_time'] = create_time
+            answerItem['crawl_time'] = crawl_time
+            yield answerItem
+        if not is_end:  # 如果不是下一页，则带上next_url回调该方法
+            next_url = answer_data['paging']['next']
+            yield scrapy.Request(url=next_url, headers=self.headers, callback=self.parse_answer)
 
     # 利用selenium登录知乎
     def login_zhihu(self):

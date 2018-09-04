@@ -113,3 +113,7 @@ PROXY_LIST = [
     "http://180.107.151.182:48036"
     "http://218.86.87.171:53281"
 ]
+# 设置下载间隔为250ms
+DOWNLOAD_DELAY = 0.25
+# [scrapy.downloadermiddlewares.robotstxt] DEBUG: Forbidden by robots.txt 解决这个错误
+ROBOTSTXT_OBEY = False
