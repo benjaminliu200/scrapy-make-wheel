@@ -6,6 +6,7 @@ import re
 import time
 from urlparse import urljoin
 
+import os
 import scrapy
 from scrapy import Spider
 from selenium import webdriver
@@ -34,7 +35,7 @@ class ZhihuSpider(Spider):
     def start_requests(self):
         # 首次要执行登录知乎，用来保存cookies，
         # 之后的请求可以注释该方法，每次请求都做登录那真的很烦
-        # self.login_zhihu()
+        self.login_zhihu()
         # 读取login保存的cookies值
         with open('zhihuCookies.json', 'r+') as f:
             listcookies = json.load(f)
@@ -174,12 +175,14 @@ class ZhihuSpider(Spider):
     def login_zhihu(self):
         # chrome_path = r"D:\software\tools\chromdriver\chromedriver.exe"
         # driver = webdriver.Chrome(chrome_path)
-
-        options = webdriver.ChromeOptions()
-        # 58版本的chrome匹配2.30版本的chromedriver
-        options.binary_location = r"C:\Users\liudeyong\AppData\Local\Google\Chrome\Application\chrome.exe"
-        chrome_driver_binary = r"D:\software\tools\chromdriver\chromedriver230.exe"
-        driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)
+        if os.name == 'nt':
+            options = webdriver.ChromeOptions()
+            # 58版本的chrome匹配2.30版本的chromedriver
+            options.binary_location = r"C:\Users\liudeyong\AppData\Local\Google\Chrome\Application\chrome.exe"
+            chrome_driver_binary = r"D:\software\tools\chromdriver\chromedriver230.exe"
+            driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)
+        elif os.name == 'posix':
+            driver = webdriver.Chrome('/Users/liudeyong/tools/java/chromdriver/chromedriver')
         loginurl = 'https://www.zhihu.com/signin'
         # 加载webdriver驱动，用于获取登录页面标签属性
         driver.get(loginurl)

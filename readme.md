@@ -55,3 +55,7 @@ pip install Pillow
 错误1：遇到mysqlclient安装失败，可以去https://www.lfd.uci.edu/~gohlke/pythonlibs/#mysql-python找到合适的mysqlclient
 <br />
 pip install C:\Users\liudeyong\Downloads\mysqlclient-1.3.13-cp27-cp27m-win_amd64.whl
+
+### mac 缺少libmysqlclient.18.dylib
+需要先关闭sip。进入mac的修复模式，然后工具打开终端：输入 csrutil disable
+sudo ln -s /usr/local/mysql/lib/libmysqlclient.18.dylib /usr/lib/libmysqlclient.18.dylib
